@@ -144,6 +144,13 @@ class _LauncherWidgetState extends State<LauncherWidget> {
   void _handleKeyEvent(KeyEvent event) {
     if (event is! KeyDownEvent) return;
 
+    // Global Ctrl+Q to quit
+    if (HardwareKeyboard.instance.isControlPressed &&
+        event.logicalKey == LogicalKeyboardKey.keyQ) {
+      widget.onClose();
+      return;
+    }
+
     // Global ESC key handling
     if (event.logicalKey == LogicalKeyboardKey.escape) {
       if (_mode == LauncherMode.add || _mode == LauncherMode.edit) {
@@ -206,7 +213,7 @@ class _LauncherWidgetState extends State<LauncherWidget> {
   Widget _buildFooter() {
     String hintText;
     if (_mode == LauncherMode.search) {
-      hintText = 'Ctrl+E or Double-click to edit  |  Delete to remove  |  Ctrl+N to add  |  ESC to close';
+      hintText = 'Ctrl+E or Double-click to edit  |  Delete to remove  |  Ctrl+N to add  |  Ctrl+Q or ESC to quit';
     } else if (_mode == LauncherMode.edit) {
       hintText = 'Ctrl+S or Ctrl+Enter to save  |  Ctrl+D to delete  |  ESC to cancel';
     } else {

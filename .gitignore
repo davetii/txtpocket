@@ -53,7 +53,7 @@ pubspec.lock
 **/generated_plugin_registrant.cc
 **/generated_plugin_registrant.h
 **/generated_plugins.cmake
-windows/flutter/ephemeral/
+windows/flutter
 
 # Windows build artifacts
 windows/CMakeFiles/

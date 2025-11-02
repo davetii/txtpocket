@@ -27,10 +27,13 @@ void main() {
     });
   });
 
-  Widget createTestWidget(VoidCallback onClose) {
+  Widget createTestWidget(VoidCallback onHide, {VoidCallback? onQuit}) {
     return MaterialApp(
       home: Scaffold(
-        body: LauncherWidget(onClose: onClose),
+        body: LauncherWidget(
+          onHide: onHide,
+          onQuit: onQuit ?? () {},
+        ),
       ),
     );
   }
@@ -61,7 +64,8 @@ void main() {
       await tester.pumpAndSettle();
 
       // Assert
-      expect(find.text('Ctrl+E or Double-click to edit  |  Ctrl+N to add  |  ESC to close'), findsOneWidget);
+      expect(find.textContaining('Ctrl+E or Double-click to edit'), findsOneWidget);
+      expect(find.textContaining('Ctrl+Q to quit'), findsOneWidget);
     });
 
     testWidgets('should start in search mode by default', (WidgetTester tester) async {
@@ -218,7 +222,8 @@ void main() {
       await tester.pumpAndSettle();
 
       // Assert
-      expect(find.text('Ctrl+S or Ctrl+Enter to save  |  ESC to cancel'), findsOneWidget);
+      expect(find.textContaining('Ctrl+S or Ctrl+Enter to save'), findsOneWidget);
+      expect(find.textContaining('ESC to cancel'), findsOneWidget);
     });
   });
 
@@ -289,20 +294,20 @@ void main() {
       expect(find.text('➕'), findsNothing);
     });
 
-    testWidgets('should call onClose when ESC is pressed in search mode', (WidgetTester tester) async {
+    testWidgets('should not hide when ESC is pressed in search mode', (WidgetTester tester) async {
       // Arrange
-      bool closeCalled = false;
+      bool hideCalled = false;
       await tester.pumpWidget(createTestWidget(() {
-        closeCalled = true;
+        hideCalled = true;
       }));
       await tester.pumpAndSettle();
 
-      // Act
+      // Act - Press ESC in search mode
       await tester.sendKeyEvent(LogicalKeyboardKey.escape);
       await tester.pumpAndSettle();
 
-      // Assert
-      expect(closeCalled, true);
+      // Assert - Should NOT hide (clicking outside hides instead)
+      expect(hideCalled, false);
     });
   });
 
@@ -405,13 +410,13 @@ void main() {
 
     testWidgets('should handle tap on snippet item', (WidgetTester tester) async {
       // Arrange
-      bool closeCalled = false;
+      bool hideCalled = false;
       await dbService.addSnippet(
         Snippet.create(title: 'Test Snippet', content: 'Content'),
       );
 
       await tester.pumpWidget(createTestWidget(() {
-        closeCalled = true;
+        hideCalled = true;
       }));
       await tester.pumpAndSettle();
 
@@ -419,8 +424,8 @@ void main() {
       await tester.tap(find.text('Test Snippet'));
       await tester.pumpAndSettle();
 
-      // Assert - onClose should be called
-      expect(closeCalled, true);
+      // Assert - onHide should be called
+      expect(hideCalled, true);
     });
   });
 
@@ -483,7 +488,8 @@ void main() {
       await tester.pumpAndSettle();
 
       // Assert
-      expect(find.text('Ctrl+S or Ctrl+Enter to save  |  ESC to cancel'), findsOneWidget);
+      expect(find.textContaining('Ctrl+S or Ctrl+Enter to save'), findsOneWidget);
+      expect(find.textContaining('ESC to cancel'), findsOneWidget);
     });
 
     testWidgets('should populate form fields with snippet data in edit mode', (WidgetTester tester) async {

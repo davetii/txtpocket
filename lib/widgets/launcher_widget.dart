@@ -9,9 +9,14 @@ import 'snippet_form_widget.dart';
 enum LauncherMode { search, add, edit }
 
 class LauncherWidget extends StatefulWidget {
-  final VoidCallback onClose;
+  final VoidCallback onHide;
+  final VoidCallback onQuit;
 
-  const LauncherWidget({Key? key, required this.onClose}) : super(key: key);
+  const LauncherWidget({
+    Key? key,
+    required this.onHide,
+    required this.onQuit,
+  }) : super(key: key);
 
   @override
   State<LauncherWidget> createState() => _LauncherWidgetState();
@@ -68,7 +73,7 @@ class _LauncherWidgetState extends State<LauncherWidget> {
   Future<void> _selectSnippet(Snippet snippet) async {
     await ClipboardService.copyToClipboard(snippet.content);
     await _dbService.incrementUsage(snippet.id);
-    widget.onClose();
+    widget.onHide();
   }
 
   Future<void> _deleteSnippet(Snippet snippet) async {
@@ -147,17 +152,16 @@ class _LauncherWidgetState extends State<LauncherWidget> {
     // Global Ctrl+Q to quit
     if (HardwareKeyboard.instance.isControlPressed &&
         event.logicalKey == LogicalKeyboardKey.keyQ) {
-      widget.onClose();
+      widget.onQuit();
       return;
     }
 
-    // Global ESC key handling
+    // ESC key handling - only for canceling add/edit modes
     if (event.logicalKey == LogicalKeyboardKey.escape) {
       if (_mode == LauncherMode.add || _mode == LauncherMode.edit) {
         _switchToSearchMode();
-      } else {
-        widget.onClose();
       }
+      // In search mode, ESC does nothing - clicking outside already hides
       return;
     }
 
@@ -213,11 +217,11 @@ class _LauncherWidgetState extends State<LauncherWidget> {
   Widget _buildFooter() {
     String hintText;
     if (_mode == LauncherMode.search) {
-      hintText = 'Ctrl+E or Double-click to edit  |  Delete to remove  |  Ctrl+N to add  |  Ctrl+Q or ESC to quit';
+      hintText = 'Ctrl+E or Double-click to edit  |  Delete to remove  |  Ctrl+N to add  |  ESC to close';
     } else if (_mode == LauncherMode.edit) {
-      hintText = 'Ctrl+S or Ctrl+Enter to save  |  Ctrl+D to delete  |  ESC to cancel';
+      hintText = 'Ctrl+S or Ctrl+Enter to save  |  Ctrl+D to delete  |  ESC to cancel  |  Ctrl+Q to quit';
     } else {
-      hintText = 'Ctrl+S or Ctrl+Enter to save  |  ESC to cancel';
+      hintText = 'Ctrl+S or Ctrl+Enter to save  |  ESC to cancel  |  Ctrl+Q to quit';
     }
 
     return Container(

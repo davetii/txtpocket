@@ -14,13 +14,6 @@ This file tracks planned features, improvements, and bug fixes for TxtPocket.
 
 ### Core Features
 - [ ] Global hotkey support (e.g., Ctrl+Shift+Space to launch from anywhere)
-- [ ] Edit snippet functionality
-  - [ ] Add edit button/shortcut in search mode
-  - [ ] Implement edit form (pre-populated with existing data)
-  - [ ] Update database service method
-- [ ] Delete snippet functionality
-  - [ ] Add delete button/confirmation dialog
-  - [ ] Implement delete operation with undo option
 - [ ] Snippet categories/tags
   - [ ] Add tags field to Snippet model
   - [ ] Update database schema and regenerate
@@ -123,10 +116,16 @@ This file tracks planned features, improvements, and bug fixes for TxtPocket.
 - [x] Usage tracking
 - [x] Keyboard navigation
 - [x] Add new snippet mode
+- [x] Edit snippet mode
 - [x] Clipboard integration
 - [x] Frameless window implementation
 - [x] Sample data loading on first run
 - [x] Basic keyboard shortcuts
+- [x] Delete snippet functionality
+  - [x] Delete key in search mode with confirmation dialog
+  - [x] Delete button in edit mode
+  - [x] Undo functionality with snackbar
+  - [x] Ctrl+D hotkey in edit mode
 
 ---
 

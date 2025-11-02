@@ -3,8 +3,10 @@
 #
 
 list(APPEND FLUTTER_PLUGIN_LIST
+  hotkey_manager
   isar_flutter_libs
   screen_retriever
+  system_tray
   window_manager
 )
 

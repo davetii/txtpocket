@@ -19,6 +19,7 @@ A minimal text snippet manager with a quick launcher interface built with Flutte
 ## Screenshots
 
 The app launches directly into a 600x500 frameless window with the search interface ready to use.
+![](docs/images/screenshot.png "txtpocket")
 
 ## Installation
 

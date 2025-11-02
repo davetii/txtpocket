@@ -6,12 +6,14 @@ class SnippetFormWidget extends StatefulWidget {
   final Snippet? editingSnippet;
   final VoidCallback onCancel;
   final Function(String title, String content) onSave;
+  final Function(Snippet)? onDelete;
 
   const SnippetFormWidget({
     Key? key,
     this.editingSnippet,
     required this.onCancel,
     required this.onSave,
+    this.onDelete,
   }) : super(key: key);
 
   @override
@@ -67,9 +69,13 @@ class SnippetFormWidgetState extends State<SnippetFormWidget> {
         HardwareKeyboard.instance.isControlPressed;
     final isCtrlS = event.logicalKey == LogicalKeyboardKey.keyS &&
         HardwareKeyboard.instance.isControlPressed;
+    final isCtrlD = event.logicalKey == LogicalKeyboardKey.keyD &&
+        HardwareKeyboard.instance.isControlPressed;
 
     if (isCtrlEnter || isCtrlS) {
       _handleSave();
+    } else if (isCtrlD && widget.editingSnippet != null && widget.onDelete != null) {
+      widget.onDelete!(widget.editingSnippet!);
     }
   }
 
@@ -151,23 +157,40 @@ class SnippetFormWidgetState extends State<SnippetFormWidget> {
           const SizedBox(height: 16),
           // Buttons
           Row(
-            mainAxisAlignment: MainAxisAlignment.end,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              TextButton(
-                onPressed: widget.onCancel,
-                style: TextButton.styleFrom(
-                  foregroundColor: Colors.grey,
-                ),
-                child: const Text('Cancel'),
-              ),
-              const SizedBox(width: 8),
-              ElevatedButton(
-                onPressed: _handleSave,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue,
-                  foregroundColor: Colors.white,
-                ),
-                child: const Text('Save'),
+              // Delete button (only in edit mode)
+              if (isEditMode && widget.onDelete != null)
+                TextButton.icon(
+                  onPressed: () => widget.onDelete!(widget.editingSnippet!),
+                  style: TextButton.styleFrom(
+                    foregroundColor: Colors.red,
+                  ),
+                  icon: const Icon(Icons.delete_outline),
+                  label: const Text('Delete'),
+                )
+              else
+                const SizedBox.shrink(),
+              // Save/Cancel buttons
+              Row(
+                children: [
+                  TextButton(
+                    onPressed: widget.onCancel,
+                    style: TextButton.styleFrom(
+                      foregroundColor: Colors.grey,
+                    ),
+                    child: const Text('Cancel'),
+                  ),
+                  const SizedBox(width: 8),
+                  ElevatedButton(
+                    onPressed: _handleSave,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blue,
+                      foregroundColor: Colors.white,
+                    ),
+                    child: const Text('Save'),
+                  ),
+                ],
               ),
             ],
           ),

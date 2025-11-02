@@ -24,6 +24,7 @@ class _LauncherWidgetState extends State<LauncherWidget> {
 
   LauncherMode _mode = LauncherMode.search;
   Snippet? _editingSnippet;
+  Snippet? _deletedSnippet;
 
   void _switchToAddMode() {
     setState(() {
@@ -68,6 +69,76 @@ class _LauncherWidgetState extends State<LauncherWidget> {
     await ClipboardService.copyToClipboard(snippet.content);
     await _dbService.incrementUsage(snippet.id);
     widget.onClose();
+  }
+
+  Future<void> _deleteSnippet(Snippet snippet) async {
+    // Show confirmation dialog
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: const Color(0xFF2D2D30),
+        title: const Text(
+          'Delete Snippet?',
+          style: TextStyle(color: Colors.white),
+        ),
+        content: Text(
+          'Are you sure you want to delete "${snippet.title}"?\n\nThis action can be undone.',
+          style: const TextStyle(color: Colors.grey),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red,
+              foregroundColor: Colors.white,
+            ),
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true) {
+      // Store for undo
+      setState(() {
+        _deletedSnippet = snippet;
+      });
+
+      // Delete from database
+      await _dbService.deleteSnippet(snippet.id);
+
+      // Return to search mode if in edit mode
+      if (_mode == LauncherMode.edit) {
+        _switchToSearchMode();
+      }
+
+      // Show undo snackbar
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Deleted "${snippet.title}"'),
+            backgroundColor: const Color(0xFF2D2D30),
+            action: SnackBarAction(
+              label: 'Undo',
+              textColor: Colors.blue,
+              onPressed: () async {
+                if (_deletedSnippet != null) {
+                  await _dbService.addSnippet(_deletedSnippet!);
+                  setState(() {
+                    _deletedSnippet = null;
+                  });
+                }
+              },
+            ),
+            duration: const Duration(seconds: 5),
+          ),
+        );
+      }
+    }
   }
 
   void _handleKeyEvent(KeyEvent event) {
@@ -116,12 +187,14 @@ class _LauncherWidgetState extends State<LauncherWidget> {
                     onAddNew: _switchToAddMode,
                     onEdit: _switchToEditMode,
                     onSelect: _selectSnippet,
+                    onDelete: _deleteSnippet,
                   )
                 : SnippetFormWidget(
                     key: _formKey,
                     editingSnippet: _editingSnippet,
                     onCancel: _switchToSearchMode,
                     onSave: _saveSnippet,
+                    onDelete: _deleteSnippet,
                   ),
             _buildFooter(),
           ],
@@ -133,9 +206,9 @@ class _LauncherWidgetState extends State<LauncherWidget> {
   Widget _buildFooter() {
     String hintText;
     if (_mode == LauncherMode.search) {
-      hintText = 'Ctrl+E or Double-click to edit  |  Ctrl+N to add  |  ESC to close';
+      hintText = 'Ctrl+E or Double-click to edit  |  Delete to remove  |  Ctrl+N to add  |  ESC to close';
     } else if (_mode == LauncherMode.edit) {
-      hintText = 'Ctrl+S or Ctrl+Enter to save  |  ESC to cancel';
+      hintText = 'Ctrl+S or Ctrl+Enter to save  |  Ctrl+D to delete  |  ESC to cancel';
     } else {
       hintText = 'Ctrl+S or Ctrl+Enter to save  |  ESC to cancel';
     }

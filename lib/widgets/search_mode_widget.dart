@@ -7,12 +7,14 @@ class SearchModeWidget extends StatefulWidget {
   final VoidCallback onAddNew;
   final Function(Snippet) onEdit;
   final Function(Snippet) onSelect;
+  final Function(Snippet) onDelete;
 
   const SearchModeWidget({
     Key? key,
     required this.onAddNew,
     required this.onEdit,
     required this.onSelect,
+    required this.onDelete,
   }) : super(key: key);
 
   @override
@@ -59,6 +61,7 @@ class SearchModeWidgetState extends State<SearchModeWidget> {
         HardwareKeyboard.instance.isControlPressed;
     final isCtrlE = event.logicalKey == LogicalKeyboardKey.keyE &&
         HardwareKeyboard.instance.isControlPressed;
+    final isDelete = event.logicalKey == LogicalKeyboardKey.delete;
 
     if (isCtrlN) {
       widget.onAddNew();
@@ -68,6 +71,13 @@ class SearchModeWidgetState extends State<SearchModeWidget> {
     if (isCtrlE) {
       if (_snippets.isNotEmpty && _selectedIndex < _snippets.length) {
         widget.onEdit(_snippets[_selectedIndex]);
+      }
+      return;
+    }
+
+    if (isDelete) {
+      if (_snippets.isNotEmpty && _selectedIndex < _snippets.length) {
+        widget.onDelete(_snippets[_selectedIndex]);
       }
       return;
     }

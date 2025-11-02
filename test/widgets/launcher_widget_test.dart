@@ -61,7 +61,7 @@ void main() {
       await tester.pumpAndSettle();
 
       // Assert
-      expect(find.text('Ctrl+N to add  |  ESC to close'), findsOneWidget);
+      expect(find.text('Ctrl+E or Double-click to edit  |  Ctrl+N to add  |  ESC to close'), findsOneWidget);
     });
 
     testWidgets('should start in search mode by default', (WidgetTester tester) async {
@@ -218,7 +218,7 @@ void main() {
       await tester.pumpAndSettle();
 
       // Assert
-      expect(find.text('Ctrl+Enter to save  |  ESC to cancel'), findsOneWidget);
+      expect(find.text('Ctrl+S or Ctrl+Enter to save  |  ESC to cancel'), findsOneWidget);
     });
   });
 
@@ -421,6 +421,247 @@ void main() {
 
       // Assert - onClose should be called
       expect(closeCalled, true);
+    });
+  });
+
+  group('LauncherWidget - Edit Mode', () {
+    testWidgets('should switch to edit mode when Ctrl+E is pressed', (WidgetTester tester) async {
+      // Arrange
+      await dbService.addSnippet(
+        Snippet.create(title: 'Test Snippet', content: 'Test Content'),
+      );
+
+      await tester.pumpWidget(createTestWidget(() {}));
+      await tester.pumpAndSettle();
+
+      // Act - Press Ctrl+E
+      await tester.sendKeyDownEvent(LogicalKeyboardKey.control);
+      await tester.sendKeyEvent(LogicalKeyboardKey.keyE);
+      await tester.sendKeyUpEvent(LogicalKeyboardKey.control);
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(find.text('✏️'), findsOneWidget);
+      expect(find.text('Edit Snippet'), findsOneWidget);
+      expect(find.text('Test Snippet'), findsOneWidget);
+      expect(find.text('Test Content'), findsOneWidget);
+    });
+
+    testWidgets('should switch to edit mode on double tap', (WidgetTester tester) async {
+      // Arrange
+      await dbService.addSnippet(
+        Snippet.create(title: 'Test Snippet', content: 'Test Content'),
+      );
+
+      await tester.pumpWidget(createTestWidget(() {}));
+      await tester.pumpAndSettle();
+
+      // Act - Double tap on snippet
+      await tester.tap(find.text('Test Snippet'));
+      await tester.pump(const Duration(milliseconds: 100));
+      await tester.tap(find.text('Test Snippet'));
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(find.text('✏️'), findsOneWidget);
+      expect(find.text('Edit Snippet'), findsOneWidget);
+    });
+
+    testWidgets('should display correct footer text in edit mode', (WidgetTester tester) async {
+      // Arrange
+      await dbService.addSnippet(
+        Snippet.create(title: 'Test Snippet', content: 'Test Content'),
+      );
+
+      await tester.pumpWidget(createTestWidget(() {}));
+      await tester.pumpAndSettle();
+
+      // Act - Switch to edit mode
+      await tester.sendKeyDownEvent(LogicalKeyboardKey.control);
+      await tester.sendKeyEvent(LogicalKeyboardKey.keyE);
+      await tester.sendKeyUpEvent(LogicalKeyboardKey.control);
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(find.text('Ctrl+S or Ctrl+Enter to save  |  ESC to cancel'), findsOneWidget);
+    });
+
+    testWidgets('should populate form fields with snippet data in edit mode', (WidgetTester tester) async {
+      // Arrange
+      await dbService.addSnippet(
+        Snippet.create(title: 'Original Title', content: 'Original Content'),
+      );
+
+      await tester.pumpWidget(createTestWidget(() {}));
+      await tester.pumpAndSettle();
+
+      // Act - Switch to edit mode
+      await tester.sendKeyDownEvent(LogicalKeyboardKey.control);
+      await tester.sendKeyEvent(LogicalKeyboardKey.keyE);
+      await tester.sendKeyUpEvent(LogicalKeyboardKey.control);
+      await tester.pumpAndSettle();
+
+      // Assert - Check that fields are populated
+      final titleFields = find.widgetWithText(TextField, 'Original Title');
+      final contentFields = find.widgetWithText(TextField, 'Original Content');
+
+      expect(titleFields, findsOneWidget);
+      expect(contentFields, findsOneWidget);
+    });
+
+    testWidgets('should update snippet when Save button is clicked in edit mode', (WidgetTester tester) async {
+      // Arrange
+      await dbService.addSnippet(
+        Snippet.create(title: 'Original Title', content: 'Original Content'),
+      );
+
+      await tester.pumpWidget(createTestWidget(() {}));
+      await tester.pumpAndSettle();
+
+      // Switch to edit mode
+      await tester.sendKeyDownEvent(LogicalKeyboardKey.control);
+      await tester.sendKeyEvent(LogicalKeyboardKey.keyE);
+      await tester.sendKeyUpEvent(LogicalKeyboardKey.control);
+      await tester.pumpAndSettle();
+
+      // Act - Modify the content
+      final titleField = find.widgetWithText(TextField, 'Original Title');
+      await tester.enterText(titleField, 'Updated Title');
+      await tester.pumpAndSettle();
+
+      // Click Save
+      await tester.tap(find.widgetWithText(ElevatedButton, 'Save'));
+      await tester.pumpAndSettle();
+
+      // Assert - Should switch back to search mode
+      expect(find.text('🔍'), findsOneWidget);
+
+      // Verify snippet was updated
+      final snippets = await dbService.getAllSnippets();
+      expect(snippets.length, 1);
+      expect(snippets.first.title, 'Updated Title');
+    });
+
+    testWidgets('should save snippet with Ctrl+S in edit mode', (WidgetTester tester) async {
+      // Arrange
+      await dbService.addSnippet(
+        Snippet.create(title: 'Original Title', content: 'Original Content'),
+      );
+
+      await tester.pumpWidget(createTestWidget(() {}));
+      await tester.pumpAndSettle();
+
+      // Switch to edit mode
+      await tester.sendKeyDownEvent(LogicalKeyboardKey.control);
+      await tester.sendKeyEvent(LogicalKeyboardKey.keyE);
+      await tester.sendKeyUpEvent(LogicalKeyboardKey.control);
+      await tester.pumpAndSettle();
+
+      // Act - Modify and save with Ctrl+S
+      final titleField = find.widgetWithText(TextField, 'Original Title');
+      await tester.enterText(titleField, 'Ctrl+S Updated');
+      await tester.pumpAndSettle();
+
+      await tester.sendKeyDownEvent(LogicalKeyboardKey.control);
+      await tester.sendKeyEvent(LogicalKeyboardKey.keyS);
+      await tester.sendKeyUpEvent(LogicalKeyboardKey.control);
+      await tester.pumpAndSettle();
+
+      // Assert - Should switch back to search mode
+      expect(find.text('🔍'), findsOneWidget);
+
+      // Verify snippet was updated
+      final snippets = await dbService.getAllSnippets();
+      expect(snippets.length, 1);
+      expect(snippets.first.title, 'Ctrl+S Updated');
+    });
+
+    testWidgets('should save snippet with Ctrl+Enter in edit mode', (WidgetTester tester) async {
+      // Arrange
+      await dbService.addSnippet(
+        Snippet.create(title: 'Original Title', content: 'Original Content'),
+      );
+
+      await tester.pumpWidget(createTestWidget(() {}));
+      await tester.pumpAndSettle();
+
+      // Switch to edit mode
+      await tester.sendKeyDownEvent(LogicalKeyboardKey.control);
+      await tester.sendKeyEvent(LogicalKeyboardKey.keyE);
+      await tester.sendKeyUpEvent(LogicalKeyboardKey.control);
+      await tester.pumpAndSettle();
+
+      // Act - Modify and save with Ctrl+Enter
+      final titleField = find.widgetWithText(TextField, 'Original Title');
+      await tester.enterText(titleField, 'Ctrl+Enter Updated');
+      await tester.pumpAndSettle();
+
+      await tester.sendKeyDownEvent(LogicalKeyboardKey.control);
+      await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+      await tester.sendKeyUpEvent(LogicalKeyboardKey.control);
+      await tester.pumpAndSettle();
+
+      // Assert - Should switch back to search mode
+      expect(find.text('🔍'), findsOneWidget);
+
+      // Verify snippet was updated
+      final snippets = await dbService.getAllSnippets();
+      expect(snippets.length, 1);
+      expect(snippets.first.title, 'Ctrl+Enter Updated');
+    });
+
+    testWidgets('should cancel edit mode when ESC is pressed', (WidgetTester tester) async {
+      // Arrange
+      await dbService.addSnippet(
+        Snippet.create(title: 'Original Title', content: 'Original Content'),
+      );
+
+      await tester.pumpWidget(createTestWidget(() {}));
+      await tester.pumpAndSettle();
+
+      // Switch to edit mode
+      await tester.sendKeyDownEvent(LogicalKeyboardKey.control);
+      await tester.sendKeyEvent(LogicalKeyboardKey.keyE);
+      await tester.sendKeyUpEvent(LogicalKeyboardKey.control);
+      await tester.pumpAndSettle();
+
+      // Act - Press ESC
+      await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+      await tester.pumpAndSettle();
+
+      // Assert - Should be back in search mode
+      expect(find.text('🔍'), findsOneWidget);
+      expect(find.text('✏️'), findsNothing);
+    });
+
+    testWidgets('should not update snippet when cancelled', (WidgetTester tester) async {
+      // Arrange
+      await dbService.addSnippet(
+        Snippet.create(title: 'Original Title', content: 'Original Content'),
+      );
+
+      await tester.pumpWidget(createTestWidget(() {}));
+      await tester.pumpAndSettle();
+
+      // Switch to edit mode
+      await tester.sendKeyDownEvent(LogicalKeyboardKey.control);
+      await tester.sendKeyEvent(LogicalKeyboardKey.keyE);
+      await tester.sendKeyUpEvent(LogicalKeyboardKey.control);
+      await tester.pumpAndSettle();
+
+      // Modify the content
+      final titleField = find.widgetWithText(TextField, 'Original Title');
+      await tester.enterText(titleField, 'Changed Title');
+      await tester.pumpAndSettle();
+
+      // Act - Cancel
+      await tester.tap(find.widgetWithText(TextButton, 'Cancel'));
+      await tester.pumpAndSettle();
+
+      // Assert - Should not have updated the snippet
+      final snippets = await dbService.getAllSnippets();
+      expect(snippets.length, 1);
+      expect(snippets.first.title, 'Original Title');
     });
   });
 }

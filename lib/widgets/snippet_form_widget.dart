@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../models/snippet.dart';
+import '../services/keyboard_helper.dart';
 
 class SnippetFormWidget extends StatefulWidget {
   final Snippet? editingSnippet;
@@ -66,11 +67,11 @@ class SnippetFormWidgetState extends State<SnippetFormWidget> {
     if (event is! KeyDownEvent) return;
 
     final isCtrlEnter = event.logicalKey == LogicalKeyboardKey.enter &&
-        HardwareKeyboard.instance.isControlPressed;
+        KeyboardHelper.isPrimaryModifierPressed();
     final isCtrlS = event.logicalKey == LogicalKeyboardKey.keyS &&
-        HardwareKeyboard.instance.isControlPressed;
+        KeyboardHelper.isPrimaryModifierPressed();
     final isCtrlD = event.logicalKey == LogicalKeyboardKey.keyD &&
-        HardwareKeyboard.instance.isControlPressed;
+        KeyboardHelper.isPrimaryModifierPressed();
 
     if (isCtrlEnter || isCtrlS) {
       _handleSave();

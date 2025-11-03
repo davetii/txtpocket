@@ -1,11 +1,12 @@
-import 'package:clipboard/clipboard.dart';
+import 'package:flutter/services.dart';
 
 class ClipboardService {
   static Future<void> copyToClipboard(String text) async {
-    await FlutterClipboard.copy(text);
+    await Clipboard.setData(ClipboardData(text: text));
   }
 
   static Future<String> getFromClipboard() async {
-    return await FlutterClipboard.paste();
+    final data = await Clipboard.getData(Clipboard.kTextPlain);
+    return data?.text ?? '';
   }
 }

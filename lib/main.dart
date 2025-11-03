@@ -23,28 +23,29 @@ void main() async {
     size: Size(600, 500),
     center: true,
     backgroundColor: Colors.transparent,
-    skipTaskbar: true, // Changed to true since we're using system tray
+    skipTaskbar: false, // Show in Dock on macOS, taskbar on Windows
     titleBarStyle: TitleBarStyle.hidden,
   );
 
   // Initialize database and load sample data if first run
   await DatabaseService().initialize();
 
-  // Setup window but start hidden
+  // Setup window and show on startup (standard dock app behavior)
   windowManager.waitUntilReadyToShow(windowOptions, () async {
-    // Don't show on startup - user will use hotkey or tray to show
-    // await windowManager.show();
-    // await windowManager.focus();
+    await windowManager.show();
+    await windowManager.focus();
   });
 
   runApp(const TxtPocketApp());
 
-  // Initialize system tray and hotkey after app starts
-  // This prevents blocking the app startup if these fail
-  Future.delayed(const Duration(milliseconds: 100), () async {
-    await initSystemTray();
-    await registerHotKey();
-  });
+  // Background app features disabled for standard dock app behavior
+  // Re-enable these when ready to implement Alfred-style functionality
+  // Future.delayed(const Duration(milliseconds: 100), () async {
+  //   if (Platform.isWindows) {
+  //     await initSystemTray();
+  //   }
+  //   await registerHotKey();
+  // });
 }
 
 Future<void> initSystemTray() async {
@@ -68,6 +69,25 @@ Future<void> initSystemTray() async {
 
       if (iconPath.isEmpty) {
         debugPrint('NOTE: System tray icon not found. App will work without tray icon.');
+        debugPrint('Checked paths: ${possiblePaths.join(", ")}');
+      }
+    } else if (Platform.isMacOS) {
+      // macOS menu bar icon - try multiple locations
+      final possiblePaths = [
+        path.join(Directory.current.path, 'data', 'flutter_assets', 'assets', 'app_icon.png'),
+        path.join(Directory.current.path, 'assets', 'app_icon.png'),
+      ];
+
+      for (final testPath in possiblePaths) {
+        if (File(testPath).existsSync()) {
+          iconPath = testPath;
+          debugPrint('Found menu bar icon at: $testPath');
+          break;
+        }
+      }
+
+      if (iconPath.isEmpty) {
+        debugPrint('NOTE: Menu bar icon not found. App will work without menu bar icon.');
         debugPrint('Checked paths: ${possiblePaths.join(", ")}');
       }
     } else {
@@ -101,16 +121,21 @@ Future<void> initSystemTray() async {
     debugPrint('System tray initialized successfully');
   } catch (e) {
     debugPrint('ERROR: Failed to initialize system tray: $e');
-    debugPrint('App will continue without system tray. Use Ctrl+Shift+T to show window.');
+    final shortcutName = Platform.isMacOS ? 'Cmd+Shift+T' : 'Ctrl+Shift+T';
+    debugPrint('App will continue without system tray. Use $shortcutName to show window.');
   }
 }
 
 Future<void> registerHotKey() async {
   try {
-    // Register Ctrl+Shift+T
+    // Register Cmd+Shift+T (macOS) or Ctrl+Shift+T (Windows/Linux)
+    final modifiers = Platform.isMacOS
+        ? [KeyModifier.meta, KeyModifier.shift]
+        : [KeyModifier.control, KeyModifier.shift];
+
     HotKey hotKey = HotKey(
       KeyCode.keyT,
-      modifiers: [KeyModifier.control, KeyModifier.shift],
+      modifiers: modifiers,
       scope: HotKeyScope.system,
     );
 
@@ -121,7 +146,8 @@ Future<void> registerHotKey() async {
       },
     );
 
-    debugPrint('Global hotkey (Ctrl+Shift+T) registered successfully');
+    final shortcutName = Platform.isMacOS ? 'Cmd+Shift+T' : 'Ctrl+Shift+T';
+    debugPrint('Global hotkey ($shortcutName) registered successfully');
   } catch (e) {
     debugPrint('ERROR: Failed to register global hotkey: $e');
     debugPrint('App will continue without global hotkey.');
@@ -129,12 +155,28 @@ Future<void> registerHotKey() async {
 }
 
 void showWindow() async {
-  await windowManager.show();
-  await windowManager.focus();
+  debugPrint('>>> showWindow() called');
+  try {
+    debugPrint('>>> Showing window...');
+    await windowManager.show();
+    debugPrint('>>> Window shown');
+    await windowManager.focus();
+    debugPrint('>>> Window focused');
+  } catch (e) {
+    debugPrint('ERROR: Failed to show window: $e');
+  }
 }
 
 void hideWindow() async {
-  await windowManager.hide();
+  debugPrint('>>> hideWindow() called');
+  debugPrint('>>> Stack trace: ${StackTrace.current}');
+  try {
+    debugPrint('>>> Hiding window...');
+    await windowManager.hide();
+    debugPrint('>>> Window hidden successfully');
+  } catch (e) {
+    debugPrint('ERROR: Failed to hide window: $e');
+  }
 }
 
 void quitApp() async {
@@ -192,12 +234,14 @@ class _HomePageState extends State<HomePage> with WindowListener {
     super.dispose();
   }
 
-  // Hide window when it loses focus (but only if window is actually shown)
+  // Auto-hide disabled for standard dock app behavior
+  // Re-enable when implementing Alfred-style functionality
   @override
   void onWindowBlur() {
-    if (_allowAutoHide) {
-      hideWindow();
-    }
+    // Standard dock apps don't auto-hide on blur
+    // if (_allowAutoHide && !Platform.isMacOS) {
+    //   hideWindow();
+    // }
   }
 
   @override

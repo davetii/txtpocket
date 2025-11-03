@@ -60,3 +60,8 @@ windows/CMakeFiles/
 windows/cmake_install.cmake
 windows/CMakeCache.txt
 windows/x64/
+
+# macOS Flutter generated files
+macos/Flutter/GeneratedPluginRegistrant.swift
+macos/Flutter/ephemeral/
+macos/Pods/

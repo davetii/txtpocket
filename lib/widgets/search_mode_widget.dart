@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../models/snippet.dart';
 import '../services/database_service.dart';
+import '../services/keyboard_helper.dart';
 
 class SearchModeWidget extends StatefulWidget {
   final VoidCallback onAddNew;
@@ -58,9 +59,9 @@ class SearchModeWidgetState extends State<SearchModeWidget> {
     if (event is! KeyDownEvent) return;
 
     final isCtrlN = event.logicalKey == LogicalKeyboardKey.keyN &&
-        HardwareKeyboard.instance.isControlPressed;
+        KeyboardHelper.isPrimaryModifierPressed();
     final isCtrlE = event.logicalKey == LogicalKeyboardKey.keyE &&
-        HardwareKeyboard.instance.isControlPressed;
+        KeyboardHelper.isPrimaryModifierPressed();
     final isDelete = event.logicalKey == LogicalKeyboardKey.delete;
 
     if (isCtrlN) {
@@ -164,9 +165,9 @@ class SearchModeWidgetState extends State<SearchModeWidget> {
                         ),
                       ),
                       const SizedBox(height: 8),
-                      const Text(
-                        'Press Ctrl+N to add your first snippet',
-                        style: TextStyle(
+                      Text(
+                        'Press ${KeyboardHelper.getShortcutPrefix()}+N to add your first snippet',
+                        style: const TextStyle(
                           color: Colors.grey,
                           fontSize: 14,
                         ),

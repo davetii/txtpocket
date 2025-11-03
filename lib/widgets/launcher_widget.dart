@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import '../models/snippet.dart';
 import '../services/database_service.dart';
 import '../services/clipboard_service.dart';
+import '../services/keyboard_helper.dart';
 import 'search_mode_widget.dart';
 import 'snippet_form_widget.dart';
 
@@ -73,7 +74,8 @@ class _LauncherWidgetState extends State<LauncherWidget> {
   Future<void> _selectSnippet(Snippet snippet) async {
     await ClipboardService.copyToClipboard(snippet.content);
     await _dbService.incrementUsage(snippet.id);
-    widget.onHide();
+    // Disable auto-hide for standard dock app behavior
+    // widget.onHide();
   }
 
   Future<void> _deleteSnippet(Snippet snippet) async {
@@ -149,8 +151,8 @@ class _LauncherWidgetState extends State<LauncherWidget> {
   void _handleKeyEvent(KeyEvent event) {
     if (event is! KeyDownEvent) return;
 
-    // Global Ctrl+Q to quit
-    if (HardwareKeyboard.instance.isControlPressed &&
+    // Global Cmd/Ctrl+Q to quit
+    if (KeyboardHelper.isPrimaryModifierPressed() &&
         event.logicalKey == LogicalKeyboardKey.keyQ) {
       widget.onQuit();
       return;
@@ -215,13 +217,14 @@ class _LauncherWidgetState extends State<LauncherWidget> {
   }
 
   Widget _buildFooter() {
+    final prefix = KeyboardHelper.getShortcutPrefix();
     String hintText;
     if (_mode == LauncherMode.search) {
-      hintText = 'Ctrl+E or Double-click to edit  |  Delete to remove  |  Ctrl+N to add  |  ESC to close';
+      hintText = '$prefix+E or Double-click to edit  |  Delete to remove  |  $prefix+N to add  |  $prefix+Q to quit';
     } else if (_mode == LauncherMode.edit) {
-      hintText = 'Ctrl+S or Ctrl+Enter to save  |  Ctrl+D to delete  |  ESC to cancel  |  Ctrl+Q to quit';
+      hintText = '$prefix+S or $prefix+Enter to save  |  $prefix+D to delete  |  ESC to cancel  |  $prefix+Q to quit';
     } else {
-      hintText = 'Ctrl+S or Ctrl+Enter to save  |  ESC to cancel  |  Ctrl+Q to quit';
+      hintText = '$prefix+S or $prefix+Enter to save  |  ESC to cancel  |  $prefix+Q to quit';
     }
 
     return Container(

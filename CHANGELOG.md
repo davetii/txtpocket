@@ -8,13 +8,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Planned
-- Global hotkey support (Cmd+Shift+Space for macOS, Ctrl+Shift+Space for Windows)
-- Edit/delete snippet functionality
 - Settings UI
 - Export/import snippets
 - Tags and categories
-- System tray icon for Windows
 - Linux platform support
+- Android
 
 ---
 

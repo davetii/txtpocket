@@ -72,11 +72,8 @@ void showWindow() async {
   try {
     // Center window before showing (Alfred-style behavior)
     await windowManager.center();
-    debugPrint('>>> Window centered');
     await windowManager.show();
-    debugPrint('>>> Window shown');
     await windowManager.focus();
-    debugPrint('>>> Window focused');
   } catch (e) {
     debugPrint('ERROR: Failed to show window: $e');
   }
@@ -86,9 +83,7 @@ void hideWindow() async {
   debugPrint('>>> hideWindow() called');
   debugPrint('>>> Stack trace: ${StackTrace.current}');
   try {
-    debugPrint('>>> Hiding window...');
     await windowManager.hide();
-    debugPrint('>>> Window hidden successfully');
   } catch (e) {
     debugPrint('ERROR: Failed to hide window: $e');
   }

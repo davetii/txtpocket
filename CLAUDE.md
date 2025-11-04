@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-TxtPocket is a minimal text snippet manager built with Flutter for Windows. It launches directly into a frameless window with a quick launcher interface for managing and copying text snippets with usage tracking.
+TxtPocket is a minimal text snippet manager built with Flutter for Windows and macOS. It launches directly into a frameless window with a quick launcher interface for managing and copying text snippets with usage tracking.
 
 ## Development Commands
 
@@ -24,6 +24,9 @@ flutter clean && flutter pub get && flutter pub run build_runner build --delete-
 ```bash
 # Run on Windows
 flutter run -d windows
+
+# Run on macOS
+flutter run -d macos
 
 # Run tests
 flutter test
@@ -69,10 +72,20 @@ flutter doctor
 - Always use `--delete-conflicting-outputs` flag to handle conflicts
 - Build runner must complete successfully before running the app
 
-### Windows Platform Requirements
+### Platform-Specific Requirements
+
+#### Windows
 - Developer Mode must be enabled on Windows 10/11
 - This is non-negotiable for Flutter Windows apps with plugins
 - See SETUP.md for enabling instructions
+
+#### macOS
+- Xcode 13+ required for builds
+- CocoaPods used for dependency management (Podfile in macos/)
+- Menu bar integration via AppDelegate.swift
+- Background app mode configurable via LSUIElement in Info.plist
+- When LSUIElement is set to true, app runs without dock icon
+- Menu bar provides "Show TxtPocket" and "Quit" options
 
 ### Keyboard Shortcuts Implementation
 - Global shortcuts (ESC) work in both modes
@@ -90,3 +103,17 @@ flutter doctor
 - Focus requests are deferred using `WidgetsBinding.instance.addPostFrameCallback` to avoid layout issues
 - This ensures the widget tree is fully laid out before attempting to focus text fields
 - Critical for preventing "RenderBox was not laid out" errors
+
+## Platform-Specific Implementation Details
+
+### macOS-Specific Files
+- **macos/Runner/AppDelegate.swift**: Handles app lifecycle, menu bar setup, window show/hide
+- **macos/Runner/Info.plist**: Contains LSUIElement flag for background app mode
+- **macos/Podfile**: CocoaPods dependency configuration
+- **macos/Podfile.lock**: Locked dependency versions (auto-generated)
+
+### Cross-Platform Considerations
+- Database path resolution works on both Windows and macOS via path_provider
+- Window manager configuration uses platform-agnostic APIs
+- Keyboard shortcuts use platform-independent Flutter APIs
+- UI remains consistent across platforms while respecting native conventions

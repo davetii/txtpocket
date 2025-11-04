@@ -11,8 +11,6 @@ PODS:
     - FlutterMacOS
   - screen_retriever_macos (0.0.1):
     - FlutterMacOS
-  - system_tray (0.0.1):
-    - FlutterMacOS
   - window_manager (0.5.0):
     - FlutterMacOS
 
@@ -22,7 +20,6 @@ DEPENDENCIES:
   - isar_flutter_libs (from `Flutter/ephemeral/.symlinks/plugins/isar_flutter_libs/macos`)
   - path_provider_foundation (from `Flutter/ephemeral/.symlinks/plugins/path_provider_foundation/darwin`)
   - screen_retriever_macos (from `Flutter/ephemeral/.symlinks/plugins/screen_retriever_macos/macos`)
-  - system_tray (from `Flutter/ephemeral/.symlinks/plugins/system_tray/macos`)
   - window_manager (from `Flutter/ephemeral/.symlinks/plugins/window_manager/macos`)
 
 SPEC REPOS:
@@ -40,8 +37,6 @@ EXTERNAL SOURCES:
     :path: Flutter/ephemeral/.symlinks/plugins/path_provider_foundation/darwin
   screen_retriever_macos:
     :path: Flutter/ephemeral/.symlinks/plugins/screen_retriever_macos/macos
-  system_tray:
-    :path: Flutter/ephemeral/.symlinks/plugins/system_tray/macos
   window_manager:
     :path: Flutter/ephemeral/.symlinks/plugins/window_manager/macos
 
@@ -52,7 +47,6 @@ SPEC CHECKSUMS:
   isar_flutter_libs: a65381780401f81ad6bf3f2e7cd0de5698fb98c4
   path_provider_foundation: bb55f6dbba17d0dccd6737fe6f7f34fbd0376880
   screen_retriever_macos: 452e51764a9e1cdb74b3c541238795849f21557f
-  system_tray: 53f0cdb020c3fbee711d3fe45ae7ce730e033d2b
   window_manager: b729e31d38fb04905235df9ea896128991cad99e
 
 PODFILE CHECKSUM: 54d867c82ac51cbd61b565781b9fada492027009

@@ -8,11 +8,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Planned
-- Global hotkey support
+- Global hotkey support (Cmd+Shift+Space for macOS, Ctrl+Shift+Space for Windows)
 - Edit/delete snippet functionality
 - Settings UI
 - Export/import snippets
 - Tags and categories
+- System tray icon for Windows
+- Linux platform support
+
+---
+
+## [1.1.0] - 2025-11-03
+
+### Added
+- **macOS platform support** - Full native macOS application
+- Menu bar integration for macOS with "Show TxtPocket" and "Quit" options
+- Background app capability (LSUIElement configuration in Info.plist)
+- macOS-specific window management with proper frameless window support
+- CocoaPods integration for macOS dependencies
+- Cross-platform compatibility improvements
+
+### Changed
+- Updated project to support both Windows and macOS platforms
+- Enhanced window_manager configuration for macOS compatibility
+- Updated dependencies to support multi-platform builds
+
+### Technical
+- macos_ui 2.0.2 for native macOS components
+- Updated AppDelegate.swift with menu bar support
+- macOS 10.14+ minimum version support
+- Xcode 13+ required for macOS builds
 
 ---
 
@@ -77,6 +102,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-[Unreleased]: https://github.com/yourusername/txtpocket/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/yourusername/txtpocket/compare/v1.1.0...HEAD
+[1.1.0]: https://github.com/yourusername/txtpocket/releases/tag/v1.1.0
 [1.0.0]: https://github.com/yourusername/txtpocket/releases/tag/v1.0.0
 [0.1.0]: https://github.com/yourusername/txtpocket/releases/tag/v0.1.0

@@ -13,7 +13,6 @@ This file tracks planned features, improvements, and bug fixes for TxtPocket.
 ## High Priority
 
 ### Core Features
-- [ ] Global hotkey support (e.g., Ctrl+Shift+Space to launch from anywhere)
 - [ ] Snippet categories/tags
   - [ ] Add tags field to Snippet model
   - [ ] Update database schema and regenerate
@@ -79,7 +78,10 @@ This file tracks planned features, improvements, and bug fixes for TxtPocket.
 - [ ] OCR integration (paste from screenshot)
 
 ### Platform Expansion
-- [ ] macOS support
+- [x] macOS support (completed in v1.1.0)
+  - [x] Frameless window implementation
+  - [x] Menu bar integration
+  - [x] Background app support
 - [ ] Linux support
 - [ ] Mobile support (iOS/Android)
   - [ ] Mobile-optimized UI
@@ -109,26 +111,6 @@ This file tracks planned features, improvements, and bug fixes for TxtPocket.
 
 ---
 
-## Completed ✓
-
-- [x] Basic snippet storage and retrieval
-- [x] Fuzzy search functionality
-- [x] Usage tracking
-- [x] Keyboard navigation
-- [x] Add new snippet mode
-- [x] Edit snippet mode
-- [x] Clipboard integration
-- [x] Frameless window implementation
-- [x] Sample data loading on first run
-- [x] Basic keyboard shortcuts
-- [x] Delete snippet functionality
-  - [x] Delete key in search mode with confirmation dialog
-  - [x] Delete button in edit mode
-  - [x] Undo functionality with snackbar
-  - [x] Ctrl+D hotkey in edit mode
-
----
-
 ## Ideas & Considerations
 
 ### Future Exploration
@@ -149,6 +131,17 @@ This file tracks planned features, improvements, and bug fixes for TxtPocket.
 
 ---
 
-**Last Updated:** 2025-11-02
+## Recently Completed
+
+### Version 1.1.0
+- [x] macOS platform support
+- [x] Menu bar integration for macOS
+- [x] Background app capability (LSUIElement support)
+- [x] Cross-platform window management
+- [x] CocoaPods integration for macOS dependencies
+
+---
+
+**Last Updated:** 2025-11-03
 
 **Note:** Priorities may change based on user feedback and development progress.

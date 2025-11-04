@@ -74,8 +74,8 @@ class _LauncherWidgetState extends State<LauncherWidget> {
   Future<void> _selectSnippet(Snippet snippet) async {
     await ClipboardService.copyToClipboard(snippet.content);
     await _dbService.incrementUsage(snippet.id);
-    // Disable auto-hide for standard dock app behavior
-    // widget.onHide();
+    // Hide window after selection (background app behavior)
+    widget.onHide();
   }
 
   Future<void> _deleteSnippet(Snippet snippet) async {

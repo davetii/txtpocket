@@ -1,10 +1,10 @@
 # TxtPocket
 
-A minimal text snippet manager with a quick launcher interface built with Flutter for Windows.
+A minimal text snippet manager with a quick launcher interface built with Flutter for Windows and macOS.
 
-![Version](https://img.shields.io/badge/version-1.0.0-blue)
+![Version](https://img.shields.io/badge/version-1.1.0-blue)
 ![Flutter](https://img.shields.io/badge/Flutter-3.0%2B-blue)
-![Platform](https://img.shields.io/badge/platform-Windows-lightgrey)
+![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS-lightgrey)
 
 ## Features
 
@@ -25,11 +25,20 @@ The app launches directly into a 600x500 frameless window with the search interf
 
 ### Prerequisites
 
+#### Windows
 - Flutter SDK 3.0 or higher with Windows support
 - Windows 10/11 with **Developer Mode enabled**
 - Visual Studio Build Tools (comes with Flutter setup)
 
-### Enable Developer Mode (Required)
+#### macOS
+- Flutter SDK 3.0 or higher with macOS support
+- macOS 10.14 or higher
+- Xcode 13 or higher
+- CocoaPods (for dependency management)
+
+### Platform-Specific Setup
+
+#### Windows: Enable Developer Mode (Required)
 
 This is **required** for Flutter to build Windows apps with plugins:
 
@@ -42,6 +51,12 @@ Alternatively, run this command:
 ```bash
 start ms-settings:developers
 ```
+
+#### macOS: Background App Configuration
+
+The macOS version includes background app support using menu bar integration. The app can run as:
+- A standard macOS app with menu bar presence
+- A background agent with LSUIElement set to true (no dock icon)
 
 ### Setup Steps
 
@@ -62,8 +77,15 @@ start ms-settings:developers
    ```
 
 4. **Run the application**
+
+   On Windows:
    ```bash
    flutter run -d windows
+   ```
+
+   On macOS:
+   ```bash
+   flutter run -d macos
    ```
 
 ## Usage
@@ -97,7 +119,8 @@ The app comes pre-loaded with 7 sample snippets on first run:
 - **Database**: [Isar](https://isar.dev/) - Fast NoSQL database for Flutter
 - **Window Manager**: [window_manager](https://pub.dev/packages/window_manager) - Frameless window support
 - **Clipboard**: [clipboard](https://pub.dev/packages/clipboard) - Cross-platform clipboard access
-- **Platform**: Windows (with potential for cross-platform expansion)
+- **macOS Integration**: [macos_ui](https://pub.dev/packages/macos_ui) - Native macOS UI components
+- **Platforms**: Windows and macOS
 
 ## Project Structure
 
@@ -114,9 +137,16 @@ txtpocket/
 │   │   └── launcher_widget.dart   # Main launcher UI
 │   └── main.dart                  # Entry point with window setup
 ├── windows/                       # Windows desktop project files
+├── macos/                         # macOS desktop project files
+│   ├── Runner/
+│   │   ├── AppDelegate.swift      # macOS app delegate with menu bar
+│   │   └── Info.plist             # macOS app configuration
+│   └── Podfile                    # CocoaPods dependencies
 ├── pubspec.yaml                   # Dependencies
 ├── CLAUDE.md                      # AI assistant guidance
 ├── SETUP.md                       # Detailed setup instructions
+├── TODO.md                        # Planned features
+├── CHANGELOG.md                   # Version history
 └── README.md                      # This file
 ```
 
@@ -130,9 +160,17 @@ flutter pub get
 flutter pub run build_runner build --delete-conflicting-outputs
 ```
 
-### Windows Build Issues
+### Platform Build Issues
+
+#### Windows
 - Verify Developer Mode is enabled
 - Ensure Visual Studio Build Tools are installed
+- Run `flutter doctor -v` to check for issues
+
+#### macOS
+- Ensure Xcode is properly installed
+- Run `pod install` in the `macos/` directory if CocoaPods dependencies fail
+- Check signing certificates in Xcode if build fails
 - Run `flutter doctor -v` to check for issues
 
 ### Database Issues
@@ -155,11 +193,18 @@ flutter pub run build_runner build --delete-conflicting-outputs
 ```
 
 ### Building for Release
+
+**Windows:**
 ```bash
 flutter build windows --release
 ```
-
 The executable will be in `build\windows\x64\runner\Release\`
+
+**macOS:**
+```bash
+flutter build macos --release
+```
+The app bundle will be in `build/macos/Build/Products/Release/`
 
 ## Roadmap
 

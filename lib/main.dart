@@ -2,8 +2,14 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:window_manager/window_manager.dart';
 import 'package:hotkey_manager/hotkey_manager.dart';
+import 'package:system_tray/system_tray.dart';
+import 'package:path/path.dart' as path;
 import 'services/database_service.dart';
 import 'widgets/launcher_widget.dart';
+
+// System tray instances (Windows only)
+final SystemTray systemTray = SystemTray();
+final Menu menuMain = Menu();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -33,10 +39,69 @@ void main() async {
 
   runApp(const TxtPocketApp());
 
-  // Initialize global hotkey
+  // Initialize system tray (Windows only) and global hotkey
   Future.delayed(const Duration(milliseconds: 100), () async {
+    if (Platform.isWindows) {
+      await initSystemTray();
+    }
     await registerHotKey();
   });
+}
+
+Future<void> initSystemTray() async {
+  try {
+    String iconPath = '';
+
+    if (Platform.isWindows) {
+      // Try multiple possible locations for the icon
+      final possiblePaths = [
+        path.join(Directory.current.path, 'data', 'flutter_assets', 'assets', 'app_icon.ico'),
+        path.join(Directory.current.path, 'assets', 'app_icon.ico'),
+      ];
+
+      for (final testPath in possiblePaths) {
+        if (File(testPath).existsSync()) {
+          iconPath = testPath;
+          debugPrint('Found icon at: $testPath');
+          break;
+        }
+      }
+
+      if (iconPath.isEmpty) {
+        debugPrint('NOTE: System tray icon not found. App will work without tray icon.');
+        debugPrint('Checked paths: ${possiblePaths.join(", ")}');
+      }
+    }
+
+    // Initialize system tray with icon
+    await systemTray.initSystemTray(
+      title: "TxtPocket",
+      iconPath: iconPath,
+    );
+
+    // Build menu
+    await menuMain.buildFrom([
+      MenuItemLabel(label: 'Show TxtPocket', onClicked: (menuItem) => showWindow()),
+      MenuSeparator(),
+      MenuItemLabel(label: 'Quit', onClicked: (menuItem) => quitApp()),
+    ]);
+
+    await systemTray.setContextMenu(menuMain);
+
+    // Handle system tray click
+    systemTray.registerSystemTrayEventHandler((eventName) {
+      if (eventName == kSystemTrayEventClick) {
+        showWindow();
+      } else if (eventName == kSystemTrayEventRightClick) {
+        systemTray.popUpContextMenu();
+      }
+    });
+
+    debugPrint('System tray initialized successfully');
+  } catch (e) {
+    debugPrint('ERROR: Failed to initialize system tray: $e');
+    debugPrint('App will continue without system tray. Use Ctrl+Shift+T to show window.');
+  }
 }
 
 Future<void> registerHotKey() async {
@@ -91,6 +156,9 @@ void hideWindow() async {
 
 void quitApp() async {
   await hotKeyManager.unregisterAll();
+  if (Platform.isWindows) {
+    await systemTray.destroy();
+  }
   exit(0);
 }
 

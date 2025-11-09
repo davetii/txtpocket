@@ -2,6 +2,50 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## 🗂️ External Memory: Notion MCP
+
+**BEFORE STARTING ANY WORK**, query the Notion TxtPocket MCP memory to understand current project state and inform decisions.
+
+**Notion Hub**: https://www.notion.so/davetii/txtPocket-2a6df0b1520d80668fe8d1bc80cb82c6
+
+### Query Instructions for Claude Code
+
+**At session start, always do this:**
+```
+Query my Notion TxtPocket MCP memory and summarize:
+1. Features & Tasks: What's In Progress or Planned?
+2. Platform-Specific Notes: Current status for Windows and macOS?
+3. Issues & Solutions Log: Any recent issues I should know about?
+4. Architecture & Design Decisions: What patterns should I follow?
+```
+
+**Before implementing**, check:
+- **Features & Tasks** - Is this work already tracked? What's the current status?
+- **Architecture & Design Decisions** - Does my approach align with existing decisions?
+- **Issues & Solutions Log** - Has this problem been encountered before?
+- **Code Patterns Library** - Is there an existing reusable pattern?
+- **Platform-Specific Notes** - Are there Windows/macOS-specific constraints?
+
+**After completing work**, update these databases:
+- **Features & Tasks** - Mark task status as Completed, add implementation notes
+- **Issues & Solutions Log** - If you encountered and fixed bugs, document them
+- **Code Patterns Library** - If you created reusable Dart/Flutter patterns
+- **Platform-Specific Notes** - Update Windows/macOS status if relevant
+
+### Available Notion Databases
+
+| Database | Purpose |
+|----------|---------|
+| **Features & Tasks** | Track work, priorities, blockers, platform targets |
+| **CLI Integration Patterns** | Document CLI tool integrations and experimental patterns |
+| **Architecture & Design Decisions** | Record design rationale, constraints, trade-offs |
+| **Code Patterns Library** | Reusable Dart/Flutter patterns and best practices |
+| **Platform-Specific Notes** | Windows/macOS status, known issues, roadmap to efficiency |
+| **Dependencies & Versions** | Package versions, performance impact, migration notes |
+| **Issues & Solutions Log** | Past problems, root causes, solutions, prevention strategies |
+
+---
+
 ## Project Overview
 
 TxtPocket is a minimal text snippet manager built with Flutter for Windows and macOS. It launches directly into a frameless window with a quick launcher interface for managing and copying text snippets with usage tracking.
@@ -51,6 +95,8 @@ flutter doctor
 4. **Frameless Window**: Uses `window_manager` package to create a borderless window with custom size (600x500) that launches directly into the search interface
 5. **Direct Launch**: App starts immediately in search mode without any intermediate UI or button clicks
 
+*See Architecture & Design Decisions in Notion for rationale behind these patterns.*
+
 ### Widget Structure
 - `main.dart`: App entry point with window_manager initialization, frameless window configuration, database initialization
 - `widgets/launcher_widget.dart`: Main UI with two modes:
@@ -78,6 +124,7 @@ flutter doctor
 - Developer Mode must be enabled on Windows 10/11
 - This is non-negotiable for Flutter Windows apps with plugins
 - See SETUP.md for enabling instructions
+- Check Platform-Specific Notes (Windows) in Notion for implementation status and known issues
 
 #### macOS
 - Xcode 13+ required for builds
@@ -86,6 +133,7 @@ flutter doctor
 - Background app mode configurable via LSUIElement in Info.plist
 - When LSUIElement is set to true, app runs without dock icon
 - Menu bar provides "Show TxtPocket" and "Quit" options
+- Check Platform-Specific Notes (macOS) in Notion for current roadmap and optimization status
 
 ### Keyboard Shortcuts Implementation
 - Global shortcuts (ESC) work in both modes
@@ -117,3 +165,19 @@ flutter doctor
 - Window manager configuration uses platform-agnostic APIs
 - Keyboard shortcuts use platform-independent Flutter APIs
 - UI remains consistent across platforms while respecting native conventions
+
+---
+
+## Working with Claude Code
+
+When starting a Claude Code session for TxtPocket work:
+```bash
+claude code "
+Query my Notion TxtPocket MCP memory (Features & Tasks, Platform-Specific Notes, Architecture & Design Decisions, Issues & Solutions).
+
+Then: [describe the specific work you want done]
+
+When done, update the relevant Notion databases (Features & Tasks status, any issues encountered, new patterns created, platform-specific updates)."
+```
+
+This ensures Claude Code always works with current project state and maintains the Notion databases as the source of truth.
